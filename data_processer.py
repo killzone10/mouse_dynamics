@@ -189,7 +189,7 @@ class DataProcesser:
     #one MM action
     def __processMM(self, x, y, t, action_file, start, stop, user):
         # print("MM")
-        self.__queueAction(x, y, t, MM,action_file, start, stop, user)
+        self.__queueAction(x, y, t, MM, action_file, start, stop, user)
         return
 
     # one DD action
@@ -206,7 +206,7 @@ class DataProcesser:
    
     def __processPC(self, x, y, t, action_file, start, stop, user): # to jest do dodania
        # print("SS")
-        # queueAction(x, y, t, DD, action_file, start, stop, user, is_legal)
+        self.__queueAction(x, y, t, PC, action_file, start, stop, user)
         return
    
     def __processCombinedPC(self, actions, action_file, start, stop, user):
@@ -221,13 +221,15 @@ class DataProcesser:
             counter += 1
             if state == "Pressed":
                 if len(t) > GLOBAL_MIN_ACTION_LENGTH: ##  if len is not sufficient then change
-                    x.append(state['x'])
-                    y.append(state['y'])
+                    x.append(action['x'])
+                    y.append(action['y'])
                     t.append(currentTimestamp)
                     self.__processPC(x, y, t, action_file, start, stop, user) ## save PC action
                 return
             else:
-                if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED 
+                if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
+                # if len(t) > GLOBAL_MIN_ACTION_LENGTH: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
+
                     stop = start + counter - 2 ## - 2 because the last 2 are release press
                     if len(t) > GLOBAL_MIN_ACTION_LENGTH:
                         self.__processMM(x, y, t, action_file, start, stop, user) ## save PC action
@@ -237,8 +239,8 @@ class DataProcesser:
                     t = []
                     start = stop + 1
                 else:
-                    x.append(state['x'])
-                    y.append(state['y'])
+                    x.append(action['x'])
+                    y.append(action['y'])
                     t.append(currentTimestamp)
             lastTimestamp = currentTimestamp
         return
@@ -252,15 +254,15 @@ class DataProcesser:
         lastTimestamp = 0
         for action in actions:
             state = action['state']
-            currentTimestamp = float(action['t'])
             button = action['button']
+            currentTimestamp = float(action['t'])
             counter += 1
             
             if button == "NoButton" and state == "Move": ## SCAN MM ACTIONS  IF THEY RE LONG ENOUGH START ANOTHER ONE
-                if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME:
+                # if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME: ## TODO
                     stop = start + counter - 2
                     if len(t) > GLOBAL_MIN_ACTION_LENGTH:
-                        self.__processMM()
+                        self.__processMM(x, y, t, action_file, start, stop, user)
                     x = []
                     y = []
                     t = []
@@ -271,7 +273,7 @@ class DataProcesser:
             if button == "Left" and state == "Pressed": ## END MM ACTION START DD
                 if len(t) > GLOBAL_MIN_ACTION_LENGTH:
                     stop = start + counter - 2
-                    self.__processMM()
+                    self.__processMM(x, y, t, action_file, start, stop, user)
                 ## STARTS DD 
                 x = []
                 y = []
@@ -303,9 +305,9 @@ class DataProcesser:
         counter = 1
         lastRow = None
 
-        with open(path) as csv:
+        with open(path) as csvFile:
             amount = 0
-            data = csv.DictReader(path)
+            data = csv.DictReader(csvFile)
             actions = []
             for row in data:
                 if amount > limit:
@@ -326,7 +328,7 @@ class DataProcesser:
                 ## actions ##
                 # SCROLLS #
                 if row['button'] == 'Scroll':
-                    pass ## TO ADD LATER 
+                    continue ## TO ADD LATER 
 
 
                 if row['button'] == 'Left' and row['state'] == 'Released': ## create EVENT
@@ -336,16 +338,17 @@ class DataProcesser:
                         start = counter
                         continue
 
-                    if lastRow != None and lastRow['state'] == "Pressed": ## PC or MM Action
-                        end = counter
-                        self.__processCombinedPC()
-                        amount += 1
-
                     if lastRow!= None and lastRow['state'] == 'Drag':
                         end = counter
-                        self.__processCombinedDD()
+                        self.__processCombinedDD(actions, fileName, start, end, user)
                         amount += 1
 
+                    if lastRow != None and lastRow['state'] == "Pressed": ## PC or MM Action
+                        end = counter
+                        self.__processCombinedPC(actions, fileName, start, end, user)
+                        amount += 1
+
+                    
                 ## Processed --> start new action
                     actions = []
                     start = end + 1
@@ -353,15 +356,13 @@ class DataProcesser:
                     if int(record['x'])< X_THRESHOLD or int(record['y']) < Y_THRESHOLD: ## TODO shold be "AND"
                         actions.append(record)
                     lastRow = row
-            stop = counter
+            end = counter # THE LAST ITERATION IF THERE IS NO RELEASE 
             if amount > limit:
-                pass ## TO DO
+                return ## TO DO
 
-            self.__processCombinedPC()
+            self.__processCombinedPC(actions, fileName, start, end, user)
+            # actions, action_file, start, stop, user)
             amount +=1
             return
 
 
-
-    def queueAction(self):
-        pass

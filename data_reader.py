@@ -3,12 +3,17 @@ from data_processer import DataProcesser
 import os 
 
 class DataReader:
-    def __init__(self, dataset, users, limit = 9999):
+    def __init__(self, dataset, users, test,  limit = 9999):
         self.users = users
         self.limit = limit # not neeeded right now
         self.fileName = f'users{users}_limit{limit}.csv'
         # TODO IF LEN add error
-        self.path = BASE_FOLDER[dataset]
+        if test == True:
+            self.path = os.path.join(BASE_FOLDER[dataset], TEST_FOLDER[dataset])
+            
+        else:
+            self.path = os.path.join(BASE_FOLDER[dataset], TRAINING_FOLDER[dataset])
+
         self.processor = DataProcesser(users, limit)
 
     def readUsers(self):
@@ -39,6 +44,9 @@ class DataReader:
         else:
             self.fileName.write(ACTION_CSV_HEADER_LEGALITY)
 
+    def getFile(self):
+        return self.fileName
+    
 
     def processData(self, legality):
         self.__createFile(legality)
@@ -49,8 +57,9 @@ class DataReader:
             if user not in self.users:
                 continue # TODO
             sessions = os.listdir(self.path + '\\' + dir)
-            limit = int(self.limit/len(sessions)) ## liczba akcji wykorzystywana dalej w walidacji
+            limit = int(self.limit/len(sessions)) ## TODO THINK ABOUT THAT 
             for session in sessions:
-                path = self.path + '\\' + dir + '\\' + session ## session file read -- TODO change to join
+                path = os.path.join(self.path, dir, session)
                 #TODO CHECK LEGALITY HERE !
                 self.processor.createProcessedCSV(path, user, self.fileName, limit, legality) ### Tworzenie CSV
+
