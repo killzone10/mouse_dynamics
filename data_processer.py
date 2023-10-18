@@ -227,8 +227,8 @@ class DataProcesser:
                     self.__processPC(x, y, t, action_file, start, stop, user) ## save PC action
                 return
             else:
+                # if currentTimestamp - lastTimestamp > 0.2: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
                 if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
-                # if len(t) > GLOBAL_MIN_ACTION_LENGTH: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
 
                     stop = start + counter - 2 ## - 2 because the last 2 are release press
                     if len(t) > GLOBAL_MIN_ACTION_LENGTH:
@@ -259,7 +259,7 @@ class DataProcesser:
             counter += 1
             
             if button == "NoButton" and state == "Move": ## SCAN MM ACTIONS  IF THEY RE LONG ENOUGH START ANOTHER ONE
-                # if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME: ## TODO
+                if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME: ## TODO
                     stop = start + counter - 2
                     if len(t) > GLOBAL_MIN_ACTION_LENGTH:
                         self.__processMM(x, y, t, action_file, start, stop, user)

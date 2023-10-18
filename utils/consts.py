@@ -2,7 +2,7 @@ import numpy as np
 
 # THIS FILE CONTAINS CONSTANTS #
 ALL_USERS = [7, 9, 12, 15, 16, 20, 21, 23, 29, 35]
-TEST_SIZE = 0.33
+TEST_SIZE = 0.2
 RANDOM_STATE = np.random.seed(0)
 ## FOLDER ## DATASET
 
