@@ -48,7 +48,7 @@ class DataReader: ## TODO THINK ABOUT POLYMOPHYSM
             self.fileName.write(ACTION_CSV_HEADER_LEGALITY[self.dataset])
 
     def getFile(self):
-        return self.fileName
+        return self.fileName.name
     
     def readUsers(self):
         return self.user
@@ -89,7 +89,11 @@ class DataReader: ## TODO THINK ABOUT POLYMOPHYSM
         #         self.processor.createProcessedCSV(path, user, self.fileName, limit, legality) ### Tworzenie CSV
         pass
 
+    def resetFileName(self):
+        self.fileName = f'{self.name}_dataset_users{self.users}_limit{self.limit}_labels{self.supervised}.csv'    
+
     def createFileNamePath(self, training, test):
+        self.resetFileName()
         if training == True:
             base, extension = os.path.splitext(self.fileName)
             self.fileName = f'{base}_Training{extension}'
@@ -100,3 +104,5 @@ class DataReader: ## TODO THINK ABOUT POLYMOPHYSM
 
     def createUnsupervisedFilename(self):
         self.fileName = f'{self.name}_dataset_users{self.users}_limit{self.limit}_labels{self.supervised}.csv'
+
+        

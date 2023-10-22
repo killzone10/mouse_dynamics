@@ -40,10 +40,10 @@ class DataReaderBalabit (DataReader):
                 path = os.path.join(self.path[0], dir, session)
                 #TODO CHECK LEGALITY HERE !
                 self.processor.createProcessedCSV(path, user, self.fileName, limit, self.supervised, legality = 1) ### Tworzenie CSV
-
+        
                     
-    def processDataWithLabels(self, legalUser, supervised, training = True, test = False):
-        self.supervised = supervised
+    def processDataWithLabels(self, legalUser, training = True, test = False):
+        self.supervised = True
         if self.supervised == False:
             raise ValueError("The boolean value cant be False in this situation")
      
