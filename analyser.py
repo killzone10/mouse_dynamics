@@ -12,6 +12,8 @@ from sklearn.ensemble import IsolationForest
 
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
+
 
 class Analyser():
     def __init__(self, fileName):
@@ -84,3 +86,33 @@ class Analyser():
 
         plt.tight_layout()
         plt.show()
+
+
+    def concatenateData(self, positiveValues, negativeValues):
+        dataset_user = pd.concat([pd.DataFrame(positiveValues), pd.DataFrame(negativeValues)]).values
+        return dataset_user
+
+    def trainingTestSplit(self, X, y, testSize, shuffle):
+        if shuffle == True: ## IF SHUFFLED NO NEED FOR ADDITIONAL SPLITTING
+            shuffled_indices = np.random.permutation(len(X))
+            X = X[shuffled_indices]
+            y = y[shuffled_indices]
+            samples = len(X)
+            testSamples = (int)(testSize* samples)
+            trainingSamples = samples - testSamples
+            X_train = X[0:trainingSamples,:]
+            X_test =  X[trainingSamples:-1, :]
+            y_train = y[0:trainingSamples]
+            y_test = y[trainingSamples:-1]
+        else: ## NOT SHUFFLED SO training amount is taken as 0:trainingSamp/2  and halfSamples: half + trainingSamp/2 
+            positiveSamples = (int)(len(X)/2)
+            testHalfSamples = (int) (positiveSamples * testSize)
+            trainHalfSamples = positiveSamples - testHalfSamples
+
+            X_train = np.concatenate((X[0:trainHalfSamples,:], X[positiveSamples: positiveSamples + trainHalfSamples,: ]))
+            X_test =  np.concatenate((X[trainHalfSamples:positiveSamples,:], X[positiveSamples + trainHalfSamples: len(X) + 1,: ]))
+            y_train = np.concatenate((y[0:trainHalfSamples], y[positiveSamples: positiveSamples + trainHalfSamples]))
+            y_test = np.concatenate((y[trainHalfSamples:positiveSamples], y[positiveSamples + trainHalfSamples: len(y) + 1 ]))
+
+        
+        return X_train, X_test, y_train, y_test

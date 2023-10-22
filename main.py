@@ -12,9 +12,8 @@ users = [7,9,15,16,20,21,23,29]
 
 
 balabit_reader = DataReaderBalabit(BALABIT, users, True, limit = 300)
-# balabit_reader.processData()
-# try:
 balabit_reader.processDataWithLabels(7, training = True, test = True, supervised = True)
 balabit_reader.processDataWithoutLabels()
-# except Exception as e:
-#         print(f"Custom error occurred: {e}")
+
+
+
