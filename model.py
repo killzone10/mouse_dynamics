@@ -4,6 +4,7 @@ from scipy.interpolate import interp1d
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import roc_curve, auc, roc_auc_score, accuracy_score
 from utils.consts import *
+import matplotlib.pyplot as plt
 
 class Model():
     def __init__(self, df, users):
@@ -51,3 +52,11 @@ class Model():
             labels.append(0)
 
         return roc_curve(labels, scores)
+    
+
+    def scaleData(self, X_train, X_validation):
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_validation = scaler.fit_transform(X_validation)
+            
+        return X_train, X_validation

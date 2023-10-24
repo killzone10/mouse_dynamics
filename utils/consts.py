@@ -2,7 +2,7 @@ import numpy as np
 
 # THIS FILE CONTAINS CONSTANTS #
 ALL_USERS = [7, 9, 12, 15, 16, 20, 21, 23, 29, 35]
-TEST_SIZE = 0.2
+TEST_SIZE = 0.3
 RANDOM_STATE = np.random.seed(0)
 ## FOLDER ## DATASET
 
@@ -32,7 +32,7 @@ DD = 4
 ## ACTION LENGHT ##
 GLOBAL_MIN_ACTION_LENGTH = 4  ## MM ACTION CONSISTS OF MINIMUM lenght 4
 CURV_THRESHOLD = 0.0005 # threshold for curvature
-GLOBAL_MIN_TIME = 10
+GLOBAL_MIN_TIME = 0.5 ## TODO
 
 
 ## HEADERS ##

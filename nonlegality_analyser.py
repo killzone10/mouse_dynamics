@@ -7,7 +7,7 @@ class nonLegalityAnalyser(Analyser):
     def __init__(self, filename):
         super().__init__(filename)
 
-
+    ## THIS PART IS BEING DONE IN ORDER TO CREATE LABELS FOR USERS FROM DATA WITHOUT LABELS ## 
     def selectNegativeSamplesWithLabel(self, legalUser, numberOfSamples):
         otherUsersData = self.df['userid'] != legalUser
         datasetNegatives = self.df[otherUsersData].sample(numberOfSamples)
@@ -34,4 +34,6 @@ class nonLegalityAnalyser(Analyser):
         data_set = self.concatenateData(array_positive, array_negative)
         return data_set
 
+    ## END OF THE LABEL PART 
 
+    
