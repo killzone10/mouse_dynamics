@@ -1,3 +1,7 @@
 *.csv
 Mouse-Dynamics-Challenge-master-2
 *.pyc
+ChaoShenCSV
+processed_data
+shen-continuous
+*.ef
