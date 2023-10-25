@@ -3,11 +3,12 @@ from data_processer_balabit import *
 
 
 class DataReaderBalabit (DataReader):
+    ## init creates dataprocesser ## 
     def __init__(self, dataset, users, supervised,  limit = 9999):
         super().__init__(dataset, users, supervised, limit)
         self.processor = DataProcesserBalabit(users, limit)
 
-   
+    ## This function checks the csv file in order to get legality variable from test files ## 
     def check_legality(self):
         legality={}
         input_file  = open('Mouse-Dynamics-Challenge-master-2\public_labels.csv', "r")

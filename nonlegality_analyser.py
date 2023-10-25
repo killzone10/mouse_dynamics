@@ -34,6 +34,27 @@ class nonLegalityAnalyser(Analyser):
         data_set = self.concatenateData(array_positive, array_negative)
         return data_set
 
-    ## END OF THE LABEL PART 
+    ## END OF THE LABEL PART ##
+
+
+    def selectPositiveSamples(self, legalUser):
+        user_positive_data = self.df.loc[self.df.iloc[:, -1].isin([legalUser])] 
+       # numberOfSamples = user_positive_data.shape[0]
+        array_positive = copy.deepcopy(user_positive_data.values)
+    
+    def selectNegativeSamples(self, legalUser, numberOfSamples):
+        otherUsersData = self.df['userid'] != legalUser
+        datasetNegatives = self.df[otherUsersData].sample(numberOfSamples)
+        array_negative = copy.deepcopy(datasetNegatives.values)
+        return array_negative
+    
+
+    def createTrainingData(self, legalUser):
+        array_positive = self.selectPositiveSamples(legalUser)
+        numberOfSamples = self.getNumberOfSamples(array_positive)
+        array_negative = self.selectNegativeSamples(legalUser, numberOfSamples)
+        data_set = self.concatenateData(array_positive, array_negative)
+        return data_set
+
 
     

@@ -60,3 +60,5 @@ class Model():
         X_validation = scaler.fit_transform(X_validation)
             
         return X_train, X_validation
+    
+    
