@@ -43,8 +43,10 @@ class DataReader: ## TODO THINK ABOUT POLYMOPHYSM
         self.fileName = open(self.fileName, "w")
         if not self.supervised:
             self.fileName.write(ACTION_CSV_HEADER[self.dataset])
+            print(ACTION_CSV_HEADER[self.dataset])
         else:
             self.fileName.write(ACTION_CSV_HEADER_LEGALITY[self.dataset])
+
     ## get file ##
     def getFile(self):
         return self.fileName.name

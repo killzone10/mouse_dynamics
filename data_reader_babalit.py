@@ -47,7 +47,6 @@ class DataReaderBalabit (DataReader):
         if self.supervised == False:
             raise ValueError("The boolean value cant be False in this situation")
      
-
         self.createFileNamePath(training, test)
         self.createFile()
 

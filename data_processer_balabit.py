@@ -280,9 +280,10 @@ class DataProcesserBalabit(DataProcesser):
                     y = []
                     t = []
                     start = stop +1
-                    x.append(action['x'])
-                    y.append(action['y'])
-                    t.append(currentTimestamp)
+                x.append(action['x'])
+                y.append(action['y'])
+                t.append(currentTimestamp)
+                    
             if button == "Left" and state == "Pressed": ## END MM ACTION START DD
                 if len(t) > GLOBAL_MIN_ACTION_LENGTH:
                     stop = start + counter - 2

@@ -211,10 +211,10 @@ class DataProcesserChaoshen(DataProcesser):
         counter = 0
         lastTimestamp = 0
         for action in actions:
-            state = action['state']
+            event = action['event']
             currentTimestamp = float(action['t'])
             counter += 1
-            if state == "Pressed":
+            if event == "Click()" or event == "RightClick()" or event == "DblClick()" or event == "RightClick()" or event == "RightDblClick()":
                 if len(t) > GLOBAL_MIN_ACTION_LENGTH: ##  if len is not sufficient then change
                     x.append(action['x'])
                     y.append(action['y'])
@@ -223,7 +223,7 @@ class DataProcesserChaoshen(DataProcesser):
                 return
             else:
                 # if currentTimestamp - lastTimestamp > 0.2: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
-                if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
+                if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME_CHAOSHEN: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
 
                     stop = start + counter - 2 ## - 2 because the last 2 are release press
                     if len(t) > GLOBAL_MIN_ACTION_LENGTH:
@@ -247,29 +247,22 @@ class DataProcesserChaoshen(DataProcesser):
         t = []
         counter = 0
         lastTimestamp = 0
+        drag = False
+
         for action in actions:
-            state = action['state']
-            button = action['button']
+            # state = action['state']
+            # button = action['button']
+            event = action['event']
             currentTimestamp = float(action['t'])
             counter += 1
             
-            if button == "NoButton" and state == "Move": ## SCAN MM ACTIONS  IF THEY RE LONG ENOUGH START ANOTHER ONE
-                if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME: ## TODO
-                    stop = start + counter - 2
-                    if len(t) > GLOBAL_MIN_ACTION_LENGTH:
-                        self.__processMM(x, y, t, action_file, start, stop, user)
-                    x = []
-                    y = []
-                    t = []
-                    start = stop +1
-                    x.append(action['x'])
-                    y.append(action['y'])
-                    t.append(currentTimestamp)
-            if button == "Left" and state == "Pressed": ## END MM ACTION START DD
+          
+            if event == "Click()" or event == "RightClick()" or event == "DblClick()" or event == "RightClick()" or event == "RightDblClick()" : ## END MM ACTION START DD
                 if len(t) > GLOBAL_MIN_ACTION_LENGTH:
                     stop = start + counter - 2
                     self.__processMM(x, y, t, action_file, start, stop, user)
                 ## STARTS DD 
+                drag = True
                 x = []
                 y = []
                 t = []
@@ -278,17 +271,36 @@ class DataProcesserChaoshen(DataProcesser):
                 y.append(action['y'])
                 t.append(currentTimestamp)
 
-            if button == 'Left' and state == 'Released':
+            if event == 'MouseEvent(WM_LBUTTONUP)' or event == 'MouseEvent(WM_RBUTTONUP)':
                 # ends the DD action
                 x.append(action['x'])
                 y.append(action['y'])
                 t.append(currentTimestamp)
                 self.__processDD(x, y, t, action_file, start, stop, user)
+                drag = False
 
-            if button == 'NoButton' and state == 'Drag':
-                x.append(action['x'])
-                y.append(action['y'])
-                t.append(currentTimestamp)
+
+            if event == "MouseEvent(WM_MOUSEMOVE)": ## SCAN MM ACTIONS  IF THEY RE LONG ENOUGH START ANOTHER ONE
+                if drag:
+                    x.append(action['x'])
+                    y.append(action['y'])
+                    t.append(currentTimestamp)
+                else:
+                    if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME_CHAOSHEN: ## TODO
+                        stop = start + counter - 2
+                        if len(t) > GLOBAL_MIN_ACTION_LENGTH:
+                            self.__processMM(x, y, t, action_file, start, stop, user) ## TODO THINK ABOUT ADDING MAX LENGHt
+                            x = []
+                            y = []
+                            t = []
+                            start = stop +1
+                    x.append(action['x'])
+                    y.append(action['y'])
+                    t.append(currentTimestamp)
+            # if button == 'NoButton' and state == 'Drag':
+            #     x.append(action['x'])
+            #     y.append(action['y'])
+            #     t.append(currentTimestamp)
             lastTimestamp = currentTimestamp
         return
 
@@ -310,7 +322,16 @@ class DataProcesserChaoshen(DataProcesser):
                 counter = counter + 1 # the counter where action starts and where it ends
                 if lastRow != None and lastRow == row:
                     continue # skipping the duplicates (there is some of it in the data)
-
+                
+                ## TAKING CARE OF DUPLICATES  in dataset ##
+                if (row['event'] == 'Click()' or row['event'] == 'DblClick()' or row['event'] == 'RightClick()') and lastRow != None:
+                        if lastRow['event'] == row['event']:
+                            continue
+                        
+                ## UNKNOWN SHOULDBT BE PROCESSED  ALSO SCROLL EVENTS SHOULD BE IGNORED##
+                if (row['event'] == 'Unknown' or row['event'] == 'MouseEvent(WM_MBUTTONUP)' or row['event'] == 'MiddleDlbClick()'):
+                    continue ## TO ADD LATER 
+                
                 ## PROCESSING actions ## 
                 record = {
                     "x": row['x'],
@@ -318,26 +339,24 @@ class DataProcesserChaoshen(DataProcesser):
                     "t": row['TimeStamp'],
                     "event": row['event'],
                 }                 
-
+                
+                ##
+               
                 ## actions ##
-                # SCROLLS #
-                if row['button'] == 'Scroll':
-                    continue ## TO ADD LATER 
-
-
-                if row['button'] == 'Left' and row['state'] == 'Released': ## create EVENT
+               
+                if row['event'] == 'MouseEvent(WM_LBUTTONUP)' or row['event'] == 'MouseEvent(WM_RBUTTONUP)': ## create EVENT ## CLICK DOUBlE CLICK
                     actions.append(record)
                     if len(actions) <= GLOBAL_MIN_ACTION_LENGTH: ## Restart the data structures, because the action is too short (maybe random)
                         actions = []
                         start = counter
                         continue
 
-                    if lastRow!= None and lastRow['state'] == 'Drag':
+                    if lastRow!= None and lastRow['event'] == 'MouseEvent(WM_MOUSEMOVE)':
                         end = counter
                         self.__processCombinedDD(actions, fileName, start, end, user)
                         amount += 1
 
-                    if lastRow != None and lastRow['state'] == "Pressed": ## PC or MM Action
+                    if (lastRow != None and (lastRow['event'] == "Click()" or (lastRow['event'] == "DblClick()"))) : ## PC or MM Action
                         end = counter
                         self.__processCombinedPC(actions, fileName, start, end, user)
                         amount += 1

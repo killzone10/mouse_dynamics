@@ -16,7 +16,9 @@ from nonlegality_analyser import *
 
 
 
-users = [7,9,15,16,20,21,23,29, 35]
+# users = [7,9,15,16,20,21,23,29, 35]
+users = [7,9,15,16,20]
+
 balabit_reader = DataReaderBalabit(BALABIT, users, True, limit = 300)
 balabit_reader.processDataWithoutLabels()
 
