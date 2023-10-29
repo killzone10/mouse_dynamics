@@ -11,7 +11,7 @@ class DataProcesserChaoshen(DataProcesser):
     
     def __computeFeatures(self, x, y, t, action, file, start, stop, user):
         lenght = len(x)
-        if lenght < GLOBAL_MIN_ACTION_LENGTH:             ## SHOULDNT EVER HAPPEN !!
+        if lenght < GLOBAL_MIN_ACTION_LENGHT_CHAOSHEN:             ## SHOULDNT EVER HAPPEN !!
             return None
         
         x = [int(n) for n in x]
@@ -215,29 +215,27 @@ class DataProcesserChaoshen(DataProcesser):
             currentTimestamp = float(action['t'])
             counter += 1
             if event == "Click()" or event == "RightClick()" or event == "DblClick()" or event == "RightClick()" or event == "RightDblClick()":
-                if len(t) > GLOBAL_MIN_ACTION_LENGTH: ##  if len is not sufficient then change
+                if len(t) > GLOBAL_MIN_ACTION_LENGHT_CHAOSHEN: ##  if len is not sufficient then change
                     x.append(action['x'])
                     y.append(action['y'])
                     t.append(currentTimestamp)
                     self.__processPC(x, y, t, action_file, start, stop, user) ## save PC action
                 return
             else:
-                # if currentTimestamp - lastTimestamp > 0.2: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
                 if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME_CHAOSHEN: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
 
                     stop = start + counter - 2 ## - 2 because the last 2 are release press
-                    if len(t) > GLOBAL_MIN_ACTION_LENGTH:
+                    if len(t) > GLOBAL_MIN_ACTION_LENGHT_CHAOSHEN:
                         self.__processMM(x, y, t, action_file, start, stop, user) ## save PC action
-
                     x = []
                     y = []
                     t = []
                     start = stop + 1
+                    lastTimestamp = currentTimestamp
                 else:
                     x.append(action['x'])
                     y.append(action['y'])
                     t.append(currentTimestamp)
-            lastTimestamp = currentTimestamp
         return
 
 
@@ -258,10 +256,11 @@ class DataProcesserChaoshen(DataProcesser):
             
           
             if event == "Click()" or event == "RightClick()" or event == "DblClick()" or event == "RightClick()" or event == "RightDblClick()" : ## END MM ACTION START DD
-                if len(t) > GLOBAL_MIN_ACTION_LENGTH:
+                if len(t) > GLOBAL_MIN_ACTION_LENGHT_CHAOSHEN:
                     stop = start + counter - 2
                     self.__processMM(x, y, t, action_file, start, stop, user)
                 ## STARTS DD 
+                lastTimestamp = currentTimestamp
                 drag = True
                 x = []
                 y = []
@@ -288,12 +287,14 @@ class DataProcesserChaoshen(DataProcesser):
                 else:
                     if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME_CHAOSHEN: ## TODO
                         stop = start + counter - 2
-                        if len(t) > GLOBAL_MIN_ACTION_LENGTH:
+                        if len(t) > GLOBAL_MIN_ACTION_LENGHT_CHAOSHEN:
                             self.__processMM(x, y, t, action_file, start, stop, user) ## TODO THINK ABOUT ADDING MAX LENGHt
                             x = []
                             y = []
                             t = []
                             start = stop +1
+                        lastTimestamp = currentTimestamp
+
                     x.append(action['x'])
                     y.append(action['y'])
                     t.append(currentTimestamp)
@@ -301,7 +302,6 @@ class DataProcesserChaoshen(DataProcesser):
             #     x.append(action['x'])
             #     y.append(action['y'])
             #     t.append(currentTimestamp)
-            lastTimestamp = currentTimestamp
         return
 
             
@@ -327,7 +327,7 @@ class DataProcesserChaoshen(DataProcesser):
                 if (row['event'] == 'Click()' or row['event'] == 'DblClick()' or row['event'] == 'RightClick()') and lastRow != None:
                         if lastRow['event'] == row['event']:
                             continue
-                        
+
                 ## UNKNOWN SHOULDBT BE PROCESSED  ALSO SCROLL EVENTS SHOULD BE IGNORED##
                 if (row['event'] == 'Unknown' or row['event'] == 'MouseEvent(WM_MBUTTONUP)' or row['event'] == 'MiddleDlbClick()'):
                     continue ## TO ADD LATER 
@@ -346,7 +346,7 @@ class DataProcesserChaoshen(DataProcesser):
                
                 if row['event'] == 'MouseEvent(WM_LBUTTONUP)' or row['event'] == 'MouseEvent(WM_RBUTTONUP)': ## create EVENT ## CLICK DOUBlE CLICK
                     actions.append(record)
-                    if len(actions) <= GLOBAL_MIN_ACTION_LENGTH: ## Restart the data structures, because the action is too short (maybe random)
+                    if len(actions) <= GLOBAL_MIN_ACTION_LENGHT_CHAOSHEN: ## Restart the data structures, because the action is too short (maybe random)
                         actions = []
                         start = counter
                         continue
