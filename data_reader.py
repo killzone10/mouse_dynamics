@@ -14,7 +14,7 @@ class DataReader: ## TODO THINK ABOUT POLYMOPHYSM
         elif dataset == 1:
             self.name = 'chaoshen'
         elif dataset == 2:
-            self.name = "Sigapur"
+            self.name = "Singapur"
         self.fileName = f'{self.name}_dataset_users{users}_limit{limit}_labels{supervised}.csv'
         ## if supervised add the path of test files in balabit ##
         if supervised == True: ## TODO add balabit requiretn
@@ -40,13 +40,16 @@ class DataReader: ## TODO THINK ABOUT POLYMOPHYSM
 
     ## CREATE FILE (its important) ##
     def createFile(self):
-        self.fileName = open(self.fileName, "w")
-        if not self.supervised:
-            self.fileName.write(ACTION_CSV_HEADER[self.dataset])
-            print(ACTION_CSV_HEADER[self.dataset])
-        else:
-            self.fileName.write(ACTION_CSV_HEADER_LEGALITY[self.dataset])
-
+        try:
+            self.fileName = open(self.fileName, "w")
+            if not self.supervised:
+                self.fileName.write(ACTION_CSV_HEADER[self.dataset])
+                print(ACTION_CSV_HEADER[self.dataset])
+            else:
+                self.fileName.write(ACTION_CSV_HEADER_LEGALITY[self.dataset])
+        except Exception as e:
+            raise Exception(f"An error occurred while processing the opening the  file: {str(e)}")
+        
     ## get file ##
     def getFile(self):
         return self.fileName.name
@@ -70,23 +73,4 @@ class DataReader: ## TODO THINK ABOUT POLYMOPHYSM
     def createUnsupervisedFilename(self):
         self.fileName = f'{self.name}_dataset_users{self.users}_limit{self.limit}_labels{self.supervised}.csv'
 
-    
-
-    def processDataWithoutLabels(self):
-        # self.__createFile(legality)
-        # dirs = os.listdir(self.path)
-        # for dir in dirs:
-        #     user = dir.split('user')
-        #     user = int(user[1])
-        #     if user not in self.users:
-        #         continue # TODO
-        #     sessions = os.listdir(self.path + '\\' + dir)
-        #     limit = int(self.limit/len(sessions)) ## TODO THINK ABOUT THAT 
-        #     for session in sessions:
-        #         path = os.path.join(self.path, dir, session)
-        #         #TODO CHECK LEGALITY HERE !
-        #         self.processor.createProcessedCSV(path, user, self.fileName, limit, legality) ### Tworzenie CSV
-        pass
-
- 
         

@@ -3,8 +3,8 @@ from data_processer_chaoshen import *
 
 
 class DataReaderChaoShen (DataReader):
-    def __init__(self, dataset, users, supervised, limit):
-        super().__init__(dataset, users, supervised, limit)
+    def __init__(self, dataset, users, limit):
+        super().__init__(dataset, users, False, limit)
         self.processor = DataProcesserChaoshen(users, limit)
 
  
@@ -14,7 +14,6 @@ class DataReaderChaoShen (DataReader):
         if self.supervised == True:
             raise ValueError("The boolean value cant be False in this situation")
         self.createUnsupervisedFilename()
-
         self.createFile()
         dirs = os.listdir(self.path[0])
         print(dirs)

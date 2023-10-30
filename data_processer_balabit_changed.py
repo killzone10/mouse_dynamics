@@ -4,12 +4,12 @@ import os
 from utils.helper_functions import *
 from data_processer import *
 
-class DataProcesserSingapur(DataProcesser):
+class DataProcesserBalabit(DataProcesser):
     def __init__(self, user, limit):
         super().__init__(user, limit)
     
     
-    def __computeFeatures(self, x, y, t, action, file, start, stop, user):
+    def __computeFeatures(self, x, y, t, action, file, start, stop, user, supervised, legality):
         lenght = len(x)
         if lenght < GLOBAL_MIN_ACTION_LENGTH:             ## SHOULDNT EVER HAPPEN !!
             return None
@@ -160,8 +160,24 @@ class DataProcesserSingapur(DataProcesser):
         largest_deviation = largestDeviation(x,y)
 
 
-       
-        result = str(action) + ',' + str(trajectory) + ',' + str(time) + ',' + str(direction) + ','+\
+        if supervised:
+            result = str(action) + ',' + str(trajectory) + ',' + str(time) + ',' + str(direction) + ','+\
+                            str(straightness)+ ','+ str(lenght)+','+str(sumOfAngles)+','+\
+                            str(mean_curv) + "," + str(sd_curv) + "," + str(max_curv) + "," +str(min_curv)+","+\
+                            str(mean_omega)+","+str(sd_omega)+","+str(max_omega)+","+str(min_omega)+","+\
+                            str(largest_deviation)+","+\
+                            str(distEndToEndLine)+","+str(numCriticalPoints)+","+\
+                            str(mean_vx)   + "," + str(sd_vx)   + "," +str(max_vx) + "," +str(min_vx)+","+\
+                            str(mean_vy)   + "," + str(sd_vy)   + "," +str(max_vy) + "," +str(min_vy)+","+\
+                            str(mean_v)    + "," + str(sd_v)    + "," +str(max_v)  + "," +str(min_v)+","+\
+                            str(mean_a)    + "," + str(sd_a)    + "," + str(max_a) + "," +str(min_a)+","+\
+                            str(mean_jerk) + "," + str(sd_jerk) + "," + str(max_jerk) + "," +str(min_jerk)+","+\
+                            str(accTimeAtBeginning)+","+\
+                            str(user)+ "," + str(legality)+\
+                            "\n"
+                            #  str(n_from)+","+str(n_to)+ "," + str(user)+\
+        else:
+            result = str(action) + ',' + str(trajectory) + ',' + str(time) + ',' + str(direction) + ','+\
                         str(straightness)+ ','+ str(lenght)+','+str(sumOfAngles)+','+\
                         str(mean_curv) + "," + str(sd_curv) + "," + str(max_curv) + "," +str(min_curv)+","+\
                         str(mean_omega)+","+str(sd_omega)+","+str(max_omega)+","+str(min_omega)+","+\
@@ -178,35 +194,35 @@ class DataProcesserSingapur(DataProcesser):
         return result
 
 
-    def __queueAction(self, x, y, t, actionCode, action_file, n_from, n_to, user):
-        result = self.__computeFeatures(x, y, t, actionCode, action_file, n_from, n_to, user) ## wykonaj liczenie feateruw
+    def __queueAction(self, x, y, t, actionCode, action_file, n_from, n_to, user, supervised, legality):
+        result = self.__computeFeatures(x, y, t, actionCode, action_file, n_from, n_to, user, supervised, legality) ## wykonaj liczenie feateruw
         if result != None:
             action_file.write(result) ## dopisz do pliku
         return
     #one MM action
-    def __processMM(self, x, y, t, action_file, start, stop, user):
+    def __processMM(self, x, y, t, action_file, start, stop, user, supervised, legality):
         # print("MM")
-        self.__queueAction(x, y, t, MM, action_file, start, stop, user)
+        self.__queueAction(x, y, t, MM, action_file, start, stop, user, supervised, legality)
         return
 
     # one DD action
-    def __processDD(self, x, y, t,action_file, start, stop, user):
+    def __processDD(self, x, y, t,action_file, start, stop, user, supervised, legality):
         # print("DD")
-        self.__queueAction(x, y, t, DD, action_file, start, stop, user)
+        self.__queueAction(x, y, t, DD, action_file, start, stop, user, supervised, legality)
         return
 
     # one SS action
-    def __processSS(self, x, y, t, action_file, start, stop, use): # to jest do dodania
+    def __processSS(self, x, y, t, action_file, start, stop, use, supervised, legality): # to jest do dodania
        # print("SS")
         # queueAction(x, y, t, DD, action_file, start, stop, user, is_legal)
         return
    
-    def __processPC(self, x, y, t, action_file, start, stop, user): # to jest do dodania
+    def __processPC(self, x, y, t, action_file, start, stop, user, supervised, legality): # to jest do dodania
        # print("SS")
-        self.__queueAction(x, y, t, PC, action_file, start, stop, user)
+        self.__queueAction(x, y, t, PC, action_file, start, stop, user, supervised, legality)
         return
    
-    def __processCombinedPC(self, actions, action_file, start, stop, user):
+    def __processCombinedPC(self, actions, action_file, start, stop, user, supervised, legality):
         x = []
         y = []
         t = []
@@ -221,63 +237,59 @@ class DataProcesserSingapur(DataProcesser):
                     x.append(action['x'])
                     y.append(action['y'])
                     t.append(currentTimestamp)
-                    self.__processPC(x, y, t, action_file, start, stop, user) ## save PC action
+                    self.__processPC(x, y, t, action_file, start, stop, user, supervised, legality) ## save PC action
                 return
             else:
                 # if currentTimestamp - lastTimestamp > 0.2: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
-                if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME_SINGAPUR: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
+                if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
 
                     stop = start + counter - 2 ## - 2 because the last 2 are release press
                     if len(t) > GLOBAL_MIN_ACTION_LENGTH:
-                        self.__processMM(x, y, t, action_file, start, stop, user) ## save PC action
+                        self.__processMM(x, y, t, action_file, start, stop, user, supervised, legality) ## save PC action
 
                     x = []
                     y = []
                     t = []
+                    lastTimestamp = currentTimestamp
                     start = stop + 1
                 else:
                     x.append(action['x'])
                     y.append(action['y'])
                     t.append(currentTimestamp)
-            lastTimestamp = currentTimestamp
+            # lastTimestamp = currentTimestamp
         return
 
 
-    def __processCombinedDD(self, actions, action_file, start, stop, user):
+    def __processCombinedDD(self, actions, action_file, start, stop, user, supervised, legality):
         x = []
         y = []
         t = []
         counter = 0
         lastTimestamp = 0
         for action in actions:
+            state = action['state']
             button = action['button']
             currentTimestamp = float(action['t'])
             counter += 1
             
-            if button == "Mouse Moved": ## SCAN MM ACTIONS  IF THEY RE LONG ENOUGH START ANOTHER ONE
-                if drag:
-                    x.append(action['x'])
-                    y.append(action['y'])
-                    t.append(currentTimestamp)
-                else:
-                    if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME_SINGAPUR: ## TODO
-                        stop = start + counter - 2
-                        if len(t) > GLOBAL_MIN_ACTION_LENGTH:
-                            self.__processMM(x, y, t, action_file, start, stop, user)
-                            x = []
-                            y = []
-                            t = []
-                            start = stop +1
-                            lastTimestamp = currentTimestamp
-
-                    x.append(action['x'])
-                    y.append(action['y'])
-                    t.append(currentTimestamp)
+            if button == "NoButton" and state == "Move": ## SCAN MM ACTIONS  IF THEY RE LONG ENOUGH START ANOTHER ONE
+                if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME: ## TODO
+                    stop = start + counter - 2
+                    if len(t) > GLOBAL_MIN_ACTION_LENGTH:
+                        self.__processMM(x, y, t, action_file, start, stop, user, supervised, legality)
+                    x = []
+                    y = []
+                    t = []
+                    start = stop +1
+                x.append(action['x'])
+                y.append(action['y'])
+                t.append(currentTimestamp)
+                lastTimestamp = currentTimestamp
                     
-            if "Pressed" in button: ## END MM ACTION START DD ## TODO DISTINGUISH BETWEEN RIGHT AND LEFT - its easy ;) ##
+            if button == "Left" and state == "Pressed": ## END MM ACTION START DD
                 if len(t) > GLOBAL_MIN_ACTION_LENGTH:
                     stop = start + counter - 2
-                    self.__processMM(x, y, t, action_file, start, stop, user)
+                    self.__processMM(x, y, t, action_file, start, stop, user, supervised, legality)
                 ## STARTS DD 
                 x = []
                 y = []
@@ -286,42 +298,34 @@ class DataProcesserSingapur(DataProcesser):
                 x.append(action['x'])
                 y.append(action['y'])
                 t.append(currentTimestamp)
-                lastTimestamp = currentTimestamp
-                drag = True
 
-            if "Released" in button:
+            if button == 'Left' and state == 'Released':
                 # ends the DD action
                 x.append(action['x'])
                 y.append(action['y'])
                 t.append(currentTimestamp)
-                self.__processDD(x, y, t, action_file, start, stop, user)
-                drag = False
+                self.__processDD(x, y, t, action_file, start, stop, user, supervised, legality)
 
-
-         
+            if button == 'NoButton' and state == 'Drag':
+                x.append(action['x'])
+                y.append(action['y'])
+                t.append(currentTimestamp)
             # lastTimestamp = currentTimestamp
         return
 
             
                 
-    def createProcessedCSV(self, path , user, fileName, limit): ## check limit 
+    def createProcessedCSV(self, path , user, fileName, limit, supervised, legality): ## check limit 
         start = 2
         end = 2
         counter = 1
         lastRow = None
-        ### HEADERS ##
-        headers = ['Timestamp', 'Action', 'x', 'y', 'User', 'resolutionX', 'resolutionY']
-        ##
-        with open(path) as data:
+
+        with open(path) as csvFile:
             amount = 0
+            data = csv.DictReader(csvFile)
             actions = []
-            for parts in data:
-
-                row = parts.strip().split(';')
-
-                if len(row) < 5:
-                    continue
-
+            for row in data:
                 if amount > limit:
                     break
                 counter = counter + 1 # the counter where action starts and where it ends
@@ -330,35 +334,37 @@ class DataProcesserSingapur(DataProcesser):
 
                 ## PROCESSING actions ## 
                 record = {
-                    "t": row[0],
-                    "button": row[1],
-                    "x": row[2],
-                    "y": row[3],
+                    "x": row['x'],
+                    "y": row['y'],
+                    "t": row['client timestamp'],
+                    "button": row['button'],
+                    "state": row['state']
                 }                 
 
                 ## actions ##
-                ## TODO ## LEGALITY ! AND DATES
-                ## FILTER OUT UNNEDED ACTIONS ##
-                if "Scroll" in row[1]:
-                    continue ## TO ADD LATER
-                
-                # if row['button'] == 'Left' and row['state'] == 'Released': ## create EVENT
-                if "Released" in row[1]:
+                # SCROLLS #
+                if row['button'] == 'Scroll':
+                    continue ## TO ADD LATER 
+
+
+                if row['button'] == 'Left' and row['state'] == 'Released': ## create EVENT
                     actions.append(record)
                     if len(actions) <= GLOBAL_MIN_ACTION_LENGTH: ## Restart the data structures, because the action is too short (maybe random)
                         actions = []
                         start = counter
                         continue
 
-                    if lastRow!= None and lastRow[1] == 'Mouse Moved':
+                    if lastRow!= None and lastRow['state'] == 'Drag':
                         end = counter
-                        if "Pressed" in actions[-3]['button']:
-                            # self.__processCombinedPC(actions, fileName, start, end, user)
-                            amount += 1
-                        else:
-                            self.__processCombinedDD(actions, fileName, start, end, user)
-                            amount += 1
+                        self.__processCombinedDD(actions, fileName, start, end, user, supervised, legality)
+                        amount += 1
 
+                    if lastRow != None and lastRow['state'] == "Pressed": ## PC or MM Action
+                        end = counter
+                        self.__processCombinedPC(actions, fileName, start, end, user, supervised, legality)
+                        amount += 1
+
+                    
                 ## Processed --> start new action
                     actions = []
                     start = end + 1
@@ -370,7 +376,7 @@ class DataProcesserSingapur(DataProcesser):
             if amount > limit:
                 return ## TO DO
 
-            self.__processCombinedPC(actions, fileName, start, end, user)
+            self.__processCombinedPC(actions, fileName, start, end, user, supervised, legality)
             # actions, action_file, start, stop, user)
             amount +=1
             return

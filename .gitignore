@@ -5,3 +5,5 @@ ChaoShenCSV
 processed_data
 shen-continuous
 *.ef
+TWOS-Dataset
+*.pyc
