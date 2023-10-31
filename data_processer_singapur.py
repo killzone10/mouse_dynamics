@@ -1,13 +1,13 @@
 from utils.consts import *
-import csv
-import os
 from utils.helper_functions import *
 from data_processer import *
+from datetime import datetime
 
 class DataProcesserSingapur(DataProcesser):
     def __init__(self, user, limit):
         super().__init__(user, limit)
-    
+        self.timestampFormat = "%Y-%m-%d %H:%M:%S,%f"
+
     
     def __computeFeatures(self, x, y, t, action, file, start, stop, user):
         lenght = len(x)
@@ -16,7 +16,7 @@ class DataProcesserSingapur(DataProcesser):
         
         x = [int(n) for n in x]
         y = [int(n) for n in y]
-        t = [float(n) for n in t]
+        t = [(n) for n in t]
 
         if containsNull(x): ## SCROLL ACTIONS
             return None
@@ -38,7 +38,7 @@ class DataProcesserSingapur(DataProcesser):
         for i in range(1, lenght):
             dx = int(x[i]) - int(x[i - 1])
             dy = int(y[i]) - int(y[i - 1])
-            dt = float(t[i]) - float(t[i-1])
+            dt = ((t[i]) - (t[i-1])).total_seconds()
             if dt == 0:
                 dt = 0.01  ## 
             vx_val = dx/dt
@@ -73,7 +73,7 @@ class DataProcesserSingapur(DataProcesser):
         no = len(angles)
         for i in range(1, no):
             dtheta = angles[ i ]-angles[ i-1 ]
-            dt = float(t[i]) - float(t[i - 1])
+            dt = ((t[i]) - (t[i - 1])).total_seconds()
             if dt == 0:
                 dt = 0.01
             omega.append( dtheta/dt)
@@ -89,7 +89,7 @@ class DataProcesserSingapur(DataProcesser):
         cont = True
         for i in range(1, lenght - 1):
             dv = v[ i ] - v[ i-1 ]
-            dt = float(t[i]) - float(t[i - 1])
+            dt = ((t[i]) - (t[i - 1])).total_seconds()
             if dt == 0:
                 dt = 0.01
             if cont  and dv > 0 :
@@ -108,7 +108,7 @@ class DataProcesserSingapur(DataProcesser):
         na = len(a)
         for i in range(1, na):
             da = a[i] - a[i - 1]
-            dt = float(t[i]) - float(t[i - 1])
+            dt = ((t[i]) - (t[i - 1])).total_seconds()
             if dt == 0:
                 dt = 0.01
             j.append(da / dt)
@@ -139,7 +139,7 @@ class DataProcesserSingapur(DataProcesser):
         min_curv = min_not_null(c, 0, len(c))
 
         # time
-        time = float(t[lenght - 1]) - float(t[0])
+        time = ((t[lenght - 1]) - (t[0])).total_seconds()
 
         # direction: -pi..pi
         theta = math.atan2(int(y[lenght - 1]) - int(y[0]), int(x[lenght - 1]) - int(x[0]))
@@ -211,12 +211,12 @@ class DataProcesserSingapur(DataProcesser):
         y = []
         t = []
         counter = 0
-        lastTimestamp = 0
+        lastTimestamp = datetime(1970, 1, 1) ## HUGE DIFF SO THE FIRST ITERATION WILL WORK
         for action in actions:
-            state = action['state']
-            currentTimestamp = float(action['t'])
+            state = action['button']
+            currentTimestamp = action['t']
             counter += 1
-            if state == "Pressed":
+            if  "Pressed" in state:
                 if len(t) > GLOBAL_MIN_ACTION_LENGTH: ##  if len is not sufficient then change
                     x.append(action['x'])
                     y.append(action['y'])
@@ -225,7 +225,7 @@ class DataProcesserSingapur(DataProcesser):
                 return
             else:
                 # if currentTimestamp - lastTimestamp > 0.2: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
-                if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME_SINGAPUR: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
+                if (currentTimestamp - lastTimestamp).total_seconds() > GLOBAL_MIN_TIME_SINGAPUR: ## TODO THIS REQUIRMENT WORKS ONLY FOR BALABIT, IT HAS TO BE CHANGED
 
                     stop = start + counter - 2 ## - 2 because the last 2 are release press
                     if len(t) > GLOBAL_MIN_ACTION_LENGTH:
@@ -235,11 +235,13 @@ class DataProcesserSingapur(DataProcesser):
                     y = []
                     t = []
                     start = stop + 1
+                    lastTimestamp = currentTimestamp
+
                 else:
                     x.append(action['x'])
                     y.append(action['y'])
                     t.append(currentTimestamp)
-            lastTimestamp = currentTimestamp
+            # lastTimestamp = currentTimestamp
         return
 
 
@@ -247,11 +249,12 @@ class DataProcesserSingapur(DataProcesser):
         x = []
         y = []
         t = []
+        drag = False
         counter = 0
-        lastTimestamp = 0
+        lastTimestamp = datetime(1970, 1, 1) ## HUGE DIFF SO THE FIRST ITERATION WILL WORK
         for action in actions:
             button = action['button']
-            currentTimestamp = float(action['t'])
+            currentTimestamp = action['t']
             counter += 1
             
             if button == "Mouse Moved": ## SCAN MM ACTIONS  IF THEY RE LONG ENOUGH START ANOTHER ONE
@@ -260,7 +263,7 @@ class DataProcesserSingapur(DataProcesser):
                     y.append(action['y'])
                     t.append(currentTimestamp)
                 else:
-                    if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME_SINGAPUR: ## TODO
+                    if (currentTimestamp - lastTimestamp).total_seconds() > GLOBAL_MIN_TIME_SINGAPUR: ## TODO
                         stop = start + counter - 2
                         if len(t) > GLOBAL_MIN_ACTION_LENGTH:
                             self.__processMM(x, y, t, action_file, start, stop, user)
@@ -268,7 +271,7 @@ class DataProcesserSingapur(DataProcesser):
                             y = []
                             t = []
                             start = stop +1
-                            lastTimestamp = currentTimestamp
+                        lastTimestamp = currentTimestamp ## TODO
 
                     x.append(action['x'])
                     y.append(action['y'])
@@ -316,12 +319,10 @@ class DataProcesserSingapur(DataProcesser):
             amount = 0
             actions = []
             for parts in data:
-
                 row = parts.strip().split(';')
 
                 if len(row) < 5:
                     continue
-
                 if amount > limit:
                     break
                 counter = counter + 1 # the counter where action starts and where it ends
@@ -330,7 +331,7 @@ class DataProcesserSingapur(DataProcesser):
 
                 ## PROCESSING actions ## 
                 record = {
-                    "t": row[0],
+                    "t": datetime.strptime(row[0], self.timestampFormat),
                     "button": row[1],
                     "x": row[2],
                     "y": row[3],
@@ -353,7 +354,7 @@ class DataProcesserSingapur(DataProcesser):
                     if lastRow!= None and lastRow[1] == 'Mouse Moved':
                         end = counter
                         if "Pressed" in actions[-3]['button']:
-                            # self.__processCombinedPC(actions, fileName, start, end, user)
+                            self.__processCombinedPC(actions, fileName, start, end, user)
                             amount += 1
                         else:
                             self.__processCombinedDD(actions, fileName, start, end, user)
