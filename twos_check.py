@@ -1,5 +1,5 @@
 from data_reader_singapur import *
 
-users = [1,2,3]
-data_reader_singapur = DataReaderSingapur(SINGAPUR, users, 300)
+users = [1]
+data_reader_singapur = DataReaderSingapur(SINGAPUR, users)
 data_reader_singapur.processDataWithoutLabels()

@@ -305,22 +305,37 @@ class DataProcesserSingapur(DataProcesser):
             # lastTimestamp = currentTimestamp
         return
 
+    def isStolen(self, timestamp, stolenSession):
+        if stolenSession[0] < timestamp < stolenSession[1]:
+            return True
+        else:
+            return False
+        
+    def isOutOfDate(self, timestamp):
+        start_date = datetime(2017, 3, 20)
+        end_date = datetime(2017, 3, 25)
+        if  timestamp < start_date or timestamp > end_date:
+            return True
+        return False
             
-                
-    def createProcessedCSV(self, path , user, fileName, limit): ## check limit 
+    def createProcessedCSV(self, path , user, fileName, limit, stolenSessions): ## check limit 
         start = 2
         end = 2
         counter = 1
         lastRow = None
+        userName = f"User{user}"
         ### HEADERS ##
         headers = ['Timestamp', 'Action', 'x', 'y', 'User', 'resolutionX', 'resolutionY']
         ##
+        stolenSession = None
+        if userName in stolenSessions:
+            stolenSession = stolenSessions[userName]
+
         with open(path) as data:
             amount = 0
             actions = []
             for parts in data:
                 row = parts.strip().split(';')
-
                 if len(row) < 5:
                     continue
                 if amount > limit:
@@ -328,7 +343,7 @@ class DataProcesserSingapur(DataProcesser):
                 counter = counter + 1 # the counter where action starts and where it ends
                 if lastRow != None and lastRow == row:
                     continue # skipping the duplicates (there is some of it in the data)
-
+                
                 ## PROCESSING actions ## 
                 record = {
                     "t": datetime.strptime(row[0], self.timestampFormat),
@@ -337,8 +352,17 @@ class DataProcesserSingapur(DataProcesser):
                     "y": row[3],
                 }                 
 
-                ## actions ##
-                ## TODO ## LEGALITY ! AND DATES
+
+                ## DATA FROM 20-03-2017 to 24-03-2017 NEEDED REST SHOULD BE FILTERED OUT !
+                if self.isOutOfDate(record['t']):
+                    continue
+        
+                ## LEGALITY ##  AS FOR NOW CONTINUE
+                if self.isStolen(record['t'], stolenSession):
+                    continue
+
+
+
                 ## FILTER OUT UNNEDED ACTIONS ##
                 if "Scroll" in row[1]:
                     continue ## TO ADD LATER
