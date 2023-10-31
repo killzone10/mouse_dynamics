@@ -241,7 +241,7 @@ class DataProcesserSingapur(DataProcesser):
                     x.append(action['x'])
                     y.append(action['y'])
                     t.append(currentTimestamp)
-            # lastTimestamp = currentTimestamp
+            lastTimestamp = currentTimestamp
         return
 
 
@@ -299,9 +299,6 @@ class DataProcesserSingapur(DataProcesser):
                 t.append(currentTimestamp)
                 self.__processDD(x, y, t, action_file, start, stop, user)
                 drag = False
-
-
-         
             # lastTimestamp = currentTimestamp
         return
 
@@ -325,8 +322,7 @@ class DataProcesserSingapur(DataProcesser):
         lastRow = None
         userName = f"User{user}"
         ### HEADERS ##
-        headers = ['Timestamp', 'Action', 'x', 'y', 'User', 'resolutionX', 'resolutionY']
-        ##
+        ## headers = ['Timestamp', 'Action', 'x', 'y', 'User', 'resolutionX', 'resolutionY']
         stolenSession = None
         if userName in stolenSessions:
             stolenSession = stolenSessions[userName]
@@ -358,7 +354,7 @@ class DataProcesserSingapur(DataProcesser):
                     continue
         
                 ## LEGALITY ##  AS FOR NOW CONTINUE
-                if self.isStolen(record['t'], stolenSession):
+                if stolenSession != None and self.isStolen(record['t'], stolenSession):
                     continue
 
 
@@ -368,13 +364,12 @@ class DataProcesserSingapur(DataProcesser):
                     continue ## TO ADD LATER
                 
                 # if row['button'] == 'Left' and row['state'] == 'Released': ## create EVENT
-                if "Released" in row[1]:
+                if "Released" in row[1]: ## TODO ADD RELEASE RIGHT ##
                     actions.append(record)
                     if len(actions) <= GLOBAL_MIN_ACTION_LENGTH: ## Restart the data structures, because the action is too short (maybe random)
                         actions = []
                         start = counter
                         continue
-
                     if lastRow!= None and lastRow[1] == 'Mouse Moved':
                         end = counter
                         if "Pressed" in actions[-3]['button']:
@@ -383,7 +378,6 @@ class DataProcesserSingapur(DataProcesser):
                         else:
                             self.__processCombinedDD(actions, fileName, start, end, user)
                             amount += 1
-
                 ## Processed --> start new action
                     actions = []
                     start = end + 1

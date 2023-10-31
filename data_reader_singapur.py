@@ -9,35 +9,9 @@ class DataReaderSingapur (DataReader):
    def __init__(self, dataset, users,  limit = 100000):
         super().__init__(dataset, users, False, limit)
         self.processor = DataProcesserSingapur(users, limit)
-        self.stolenSessions = self.create_stolen_sessions1(STOLEN_SESSIONS_FILEPATH)
+        self.stolenSessions = self.create_stolen_sessions(STOLEN_SESSIONS_FILEPATH)
    
    def create_stolen_sessions(self, file_path):
-      tuesday = datetime(2017, 3, 21)
-      thursday = datetime(2017,3, 23)
-      try:
-         df = pd.read_excel(file_path, na_filter = False)
-         stolen_sessions = {}
-
-         for idx, record in enumerate(df['Victim']):
-            date = df['Attack period'][idx]
-            splitted = date.split("-")
-            tuesday = datetime(2017, 3, 20)
-
-            # stolen_sessions[record] = {tuesday: date}
-
-
-         for idx, record in enumerate(df['Victim.1']):
-            date = df['Attack period.1'][idx]
-            # stolen_sessions[record] = {thursday: date}
-            stolen_sessions[record] = {thursday: date}
-
-
-         return stolen_sessions
-      except Exception as e:
-         raise Exception(f"An error occurred while processing the Excel file: {str(e)}")
-
-
-   def create_stolen_sessions1(self, file_path):
       tuesday = datetime(2017, 3, 21)
       thursday = datetime(2017,3, 23)
       try:
@@ -77,6 +51,8 @@ class DataReaderSingapur (DataReader):
         if self.supervised == True:
             raise ValueError("The boolean value cant be False in this situation")
         self.createUnsupervisedFilename()
+      #   if os.path.exists(self.fileName):
+      #       return
         self.createFile()
         dirs = os.listdir(self.path[0])
         for user in dirs:
@@ -88,4 +64,23 @@ class DataReaderSingapur (DataReader):
                 path = os.path.join(self.path[0], user, session)
                 self.processor.createProcessedCSV(path, user, self.fileName, limit, self.stolenSessions) ### Tworzenie CSVileName, limit, self.supervised, legality = 1) ### Tworzenie CSV
         
-          
+   
+   def processTestData(self):
+      self.supervised = False
+      if self.supervised == True:
+         raise ValueError("The boolean value cant be False in this situation")
+      dirs = os.listdir(self.path[0])
+      for user in dirs:
+         if int(user) not in self.users:
+            continue # TODO
+        
+         userName = f"User{user}"
+         if userName in self.stolenSessions:  
+            fileName = os.path.join(TEST_FILES, user)
+            fileName = open(fileName, "w")
+            sessions = os.listdir(self.path[0] + '\\' + user)
+            limit = 10000000 ## TODO THINK ABOUT THAT  
+            for session in sessions:
+                  path = os.path.join(self.path[0], user, session)
+                  self.processor.createProcessedCSV(path, user, fileName, limit, self.stolenSessions) 
+         

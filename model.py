@@ -12,11 +12,11 @@ class Model():
         self.users = users
 
     def evaluate_sequence_of_samples(self, model, X_validation, y_validation, num_actions):
-        ## SINGLE ACTION ## 
+        ## SINGLE ACTION  GIVING ONLY 1 VECTOR## 
         if num_actions == 1: 
             y_scores = model.predict_proba(X_validation)
             return roc_curve(y_validation, y_scores[:, 1])
-        ## MANY ACTIONS ##
+        ## MANY ACTIONS  MANY VECTORS##
         X_positive = []
         X_negative = []
         ## ADD TRUE LABELS ##

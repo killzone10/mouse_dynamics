@@ -15,6 +15,9 @@ class DataReader: ## TODO THINK ABOUT POLYMOPHYSM
             self.name = 'chaoshen'
         elif dataset == 2:
             self.name = "Singapur"
+        elif dataset == 3:
+            self.name = "dfl"
+            
         self.fileName = f'{self.name}_dataset_users{users}_limit{limit}_labels{supervised}.csv'
         ## if supervised add the path of test files in balabit ##
         if supervised == True: ## TODO add balabit requiretn
@@ -44,7 +47,6 @@ class DataReader: ## TODO THINK ABOUT POLYMOPHYSM
             self.fileName = open(self.fileName, "w")
             if not self.supervised:
                 self.fileName.write(ACTION_CSV_HEADER[self.dataset])
-                print(ACTION_CSV_HEADER[self.dataset])
             else:
                 self.fileName.write(ACTION_CSV_HEADER_LEGALITY[self.dataset])
         except Exception as e:

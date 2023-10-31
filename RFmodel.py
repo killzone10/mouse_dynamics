@@ -23,6 +23,7 @@ class RFModel(Model):
         y_predicted = self.model.predict(X_validation)
         test_accuracy = accuracy_score(y_validation, y_predicted)
         print("Test Accuracy: %0.2f" % test_accuracy)
+        print("NUM ACTIONS ", int(self.df.shape[1]/len(self.users)))
         fpr, tpr, thr = self.evaluate_sequence_of_samples(self.model, X_validation, y_validation, num_actions = int(self.df.shape[1]/len(self.users)))
         return fpr, tpr, thr
 
