@@ -13,6 +13,7 @@ from sklearn.ensemble import IsolationForest
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import copy
 
 
 class Analyser():
@@ -104,6 +105,7 @@ class Analyser():
             X_test =  X[trainingSamples:-1, :]
             y_train = y[0:trainingSamples]
             y_test = y[trainingSamples:-1]
+            
         else: ## NOT SHUFFLED SO training amount is taken as 0:trainingSamp/2  and halfSamples: half + trainingSamp/2 
             positiveSamples = (int)(len(X)/2)
             testHalfSamples = (int) (positiveSamples * testSize)

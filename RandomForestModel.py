@@ -3,7 +3,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
 
 
-class RFModel(Model):
+class RandomForestModel(Model):
     def __init__(self, df, users):
         super().__init__(df, users)
         self.model = RandomForestClassifier(random_state = RANDOM_STATE)
@@ -23,11 +23,10 @@ class RFModel(Model):
         y_predicted = self.model.predict(X_validation)
         test_accuracy = accuracy_score(y_validation, y_predicted)
         print("Test Accuracy: %0.2f" % test_accuracy)
-        print("NUM ACTIONS ", int(self.df.shape[1]/len(self.users)))
         fpr, tpr, thr = self.evaluate_sequence_of_samples(self.model, X_validation, y_validation, num_actions = int(self.df.shape[1]/len(self.users)))
         return fpr, tpr, thr
 
-
+    ## calculating feature importance ##
     def calculateFeatureImportance(self, X_train, y_train, X_validation):
         sumOfFeatures = np.array(0)
         counter = 0 
@@ -41,7 +40,7 @@ class RFModel(Model):
 
         return sumOfFeatures/counter
 
-
+    ## ploting feature importance ##
     def plotFeatureImportance(self, featureImportance, X, df):
         plt.figure(figsize=(8, 10))
         num_features = X.shape[1]  # Number of features in your NumPy array
@@ -56,6 +55,8 @@ class RFModel(Model):
         plt.show()
 
 
+
+    ## PERMUTATION IMPORTANCE ## 
     def calculatePermutationImportance(self, X_train, y_train, X_validation, y_validation):
         # X_train, X_validation = self.scaleData(X_train, X_validation)
 

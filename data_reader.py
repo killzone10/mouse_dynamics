@@ -2,8 +2,13 @@ from utils.consts import *
 from data_processer import DataProcesser
 import os 
 
-class DataReader: ## TODO THINK ABOUT POLYMOPHYSM 
-    ## initialiation of dataset, limit, users and path ##
+## initialiation of dataset, limit, users and path ##
+## dataset is the name of the dataset - its used to create a self.name
+# users are users analyzed
+#supervised or not supervised learning 
+# limit = how many actions should be analyzed #
+
+class DataReader:  
     def __init__(self, dataset, users, supervised, limit = 9999):
         self.users = users
         self.limit = limit # not neeeded right now
@@ -17,29 +22,29 @@ class DataReader: ## TODO THINK ABOUT POLYMOPHYSM
             self.name = "Singapur"
         elif dataset == 3:
             self.name = "dfl"
-            
-        self.fileName = f'{self.name}_dataset_users{users}_limit{limit}_labels{supervised}.csv'
+
+        self.supervised = supervised
+        self.resetFileName()
+        if not os.path.exists(OUTPUT_FILE):
+            os.makedirs(OUTPUT_FILE)
         ## if supervised add the path of test files in balabit ##
         if supervised == True: ## TODO add balabit requiretn
             self.path.append(os.path.join(BASE_FOLDER[dataset], TEST_FOLDER[dataset]))
-        self.supervised = supervised
-
+            
     ## getters ##
     def readUsers(self):
         return self.user
 
+    def setSupervised(self, supervised):
+        if supervised == True:
+            self.supervised = supervised
+            if len(self.path) == 1:
+                self.path.append(os.path.join(BASE_FOLDER[dataset], TEST_FOLDER[dataset]))
 
-    def getUser(self, index):
-        if 0 <= index < len(self.user):
-            return self.user[index]
-        else:
-            return None
-    ## Setters ## 
-    def setUser(self, index, value):
-        if 0 <= index < len(self.user):
-            self.user[index] = value
-        else:
-            print("Index out of range.")
+        if supervised == False:
+            self.supervised = supervised
+            if len(self.path) == 2:
+                self.path.pop()
 
     ## CREATE FILE (its important) ##
     def createFile(self):
@@ -58,14 +63,16 @@ class DataReader: ## TODO THINK ABOUT POLYMOPHYSM
     
     ## reset path ## (used when changing the function of creating the dataset)
     def resetFileName(self):
-        self.fileName = f'{self.name}_dataset_users{self.users}_limit{self.limit}_labels{self.supervised}.csv'    
+        fileName = f'{self.name}_dataset_users{self.users}_limit{self.limit}_labels{self.supervised}.csv'    
+        fileName = os.path.join(OUTPUT_FILE, fileName)
+        self.fileName = fileName
 
     ## path ##
-    def createFileNamePath(self, training, test):
+    def createFileNamePath(self, training, test, legalUser):
         self.resetFileName()
         if training == True:
             base, extension = os.path.splitext(self.fileName)
-            self.fileName = f'{base}_Training{extension}'
+            self.fileName = f'{base}_legalUser{legalUser}_Training{extension}'
 
         if test == True:
             base, extension = os.path.splitext(self.fileName)
@@ -73,6 +80,6 @@ class DataReader: ## TODO THINK ABOUT POLYMOPHYSM
 
     ## path ##
     def createUnsupervisedFilename(self):
-        self.fileName = f'{self.name}_dataset_users{self.users}_limit{self.limit}_labels{self.supervised}.csv'
+        self.fileName = os.path.join(OUTPUT_FILE,f'{self.name}_dataset_users{self.users}_limit{self.limit}_labels{self.supervised}.csv')
 
         

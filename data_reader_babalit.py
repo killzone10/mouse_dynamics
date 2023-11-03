@@ -2,6 +2,7 @@ from data_reader import *
 from data_processer_balabit import *
 
 
+## THIS CLASS READS THE DATA FROM THE SESSSIONS FILES ## 
 class DataReaderBalabit (DataReader):
     ## init creates dataprocesser ## 
     def __init__(self, dataset, users, supervised,  limit = 9999):
@@ -22,8 +23,8 @@ class DataReaderBalabit (DataReader):
         input_file.close()
         return legality
 
+    ## CREATING THE DATA WITHOUT LABELS AT THE END ## 
     def processDataWithoutLabels(self): ## TODO LIMT SHOULD BE CHANGED HERE SO DATA IS BALANCED !!
-        self.supervised = False
         if self.supervised == True:
             raise ValueError("The boolean value cant be False in this situation")
         self.createUnsupervisedFilename()
@@ -41,13 +42,13 @@ class DataReaderBalabit (DataReader):
                 path = os.path.join(self.path[0], dir, session)
                 self.processor.createProcessedCSV(path, user, self.fileName, limit, self.supervised, legality = 1) ### Tworzenie CSV
         
-                    
+    ## CREATING LABELS WITH THE LABELS AT THE END, training = analyzing t raining files, test = analysing test files ## 
+    # this class reads csv document in order to check if test files are true or false ##
+    #                  
     def processDataWithLabels(self, legalUser, training = True, test = False):
-        self.supervised = True
         if self.supervised == False:
             raise ValueError("The boolean value cant be False in this situation")
-     
-        self.createFileNamePath(training, test)
+        self.createFileNamePath(training, test, legalUser)
         self.createFile()
 
         if legalUser not in self.users:

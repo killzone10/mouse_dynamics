@@ -12,16 +12,14 @@ class DataReaderChaoShen (DataReader):
     def processDataWithoutLabels(self): ## TODO LIMT SHOULD BE CHANGED HERE SO DATA IS BALANCED !!
         self.supervised = False
         if self.supervised == True:
-            raise ValueError("The boolean value cant be False in this situation")
+            raise ValueError("The boolean value cant be False in this situation - use setSupervised() method first")
         self.createUnsupervisedFilename()
         self.createFile()
         dirs = os.listdir(self.path[0])
-        print(dirs)
         for user in dirs:
             if int(user) not in self.users:
                 continue # TODO
             sessions = os.listdir(self.path[0] + '\\' + user)
-            print(sessions)
             limit = int(self.limit/len(sessions)) ## TODO THINK ABOUT THAT  
             for session in sessions:
                 path = os.path.join(self.path[0], user, session)

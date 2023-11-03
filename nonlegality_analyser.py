@@ -1,5 +1,4 @@
 from analyser import *
-import copy
 
 
 
