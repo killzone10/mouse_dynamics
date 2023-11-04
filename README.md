@@ -55,3 +55,7 @@ utils/consts - stałe wykorzystywane w uczeniu
 utils/helper_functions - kilka funkcji statystycznych
 utils/plotting - nieuzywane
 
+
+Środowisko w którym robiono testy:
+- python wersja  3.9.13
+- Windows 10 Education N 22H2
