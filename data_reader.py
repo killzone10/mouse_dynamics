@@ -39,7 +39,7 @@ class DataReader:
         if supervised == True:
             self.supervised = supervised
             if len(self.path) == 1:
-                self.path.append(os.path.join(BASE_FOLDER[dataset], TEST_FOLDER[dataset]))
+                self.path.append(os.path.join(BASE_FOLDER[self.dataset], TEST_FOLDER[self.dataset]))
 
         if supervised == False:
             self.supervised = supervised
@@ -81,5 +81,16 @@ class DataReader:
     ## path ##
     def createUnsupervisedFilename(self):
         self.fileName = os.path.join(OUTPUT_FILE,f'{self.name}_dataset_users{self.users}_limit{self.limit}_labels{self.supervised}.csv')
+
+        
+    def checkIfFileExist(self):
+        if os.path.exists(self.fileName):
+            print(self.fileName)
+            print("True")
+
+            return True
+        else:
+            print("False")
+            return False
 
         

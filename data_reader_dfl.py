@@ -16,6 +16,9 @@ class DataReaderDfl (DataReader):
         self.createUnsupervisedFilename()
 
         self.createFile()
+        if self.checkIfFileExist():
+            return
+            
         dirs = os.listdir(self.path[0])
         for dir in dirs:
             user = dir.split('User')

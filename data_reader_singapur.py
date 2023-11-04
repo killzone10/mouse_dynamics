@@ -54,6 +54,9 @@ class DataReaderSingapur (DataReader):
       #   if os.path.exists(self.fileName):
       #       return
         self.createFile()
+        if self.checkIfFileExist():
+            return
+            
         dirs = os.listdir(self.path[0])
         for user in dirs:
             if int(user) not in self.users:

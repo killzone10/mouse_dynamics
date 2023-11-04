@@ -26,10 +26,17 @@ class DataReaderBalabit (DataReader):
     ## CREATING THE DATA WITHOUT LABELS AT THE END ## 
     def processDataWithoutLabels(self): ## TODO LIMT SHOULD BE CHANGED HERE SO DATA IS BALANCED !!
         if self.supervised == True:
-            raise ValueError("The boolean value cant be False in this situation")
+            raise ValueError("The boolean value cant be True in this situation. Call the setSupervised(False) method before using this function ")
+
+
         self.createUnsupervisedFilename()
 
+        if self.checkIfFileExist():
+            print("File already exist")
+            return
+        
         self.createFile()
+        
         dirs = os.listdir(self.path[0])
         for dir in dirs:
             user = dir.split('user')
@@ -47,13 +54,19 @@ class DataReaderBalabit (DataReader):
     #                  
     def processDataWithLabels(self, legalUser, training = True, test = False):
         if self.supervised == False:
-            raise ValueError("The boolean value cant be False in this situation")
-        self.createFileNamePath(training, test, legalUser)
-        self.createFile()
+            raise ValueError("The boolean value cant be False in this situation.  Call the setSupervised(True) method before using this function ")
 
         if legalUser not in self.users:
-            raise ValueError("LegalUser doesnt exist")
+            raise ValueError("The input user doesnt exist in the database - change the ID")
                 
+        self.createFileNamePath(training, test, legalUser)
+        if self.checkIfFileExist():
+            print("File already exist")
+            return
+        
+        self.createFile()
+
+  
         ## TRAINING FILES ## 
         if training:
             dirs = os.listdir(self.path[0])
