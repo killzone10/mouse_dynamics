@@ -28,17 +28,11 @@ class RandomForestModel(Model):
 
     ## calculating feature importance ##
     def calculateFeatureImportance(self, X_train, y_train, X_validation):
-        sumOfFeatures = np.array(0)
-        counter = 0 
-        for i in range (1, 100):
-            counter +=1 
-            model = RandomForestClassifier(random_state = RANDOM_STATE)
-            # X_train, X_validation = self.scaleData(X_train, X_validation)
-            model.fit(X_train, y_train)
-            feature_importance = model.feature_importances_
-            sumOfFeatures = np.add(sumOfFeatures, feature_importance)
-
-        return sumOfFeatures/counter
+        model = RandomForestClassifier(random_state = RANDOM_STATE)
+        # X_train, X_validation = self.scaleData(X_train, X_validation)
+        model.fit(X_train, y_train)
+        feature_importance = model.feature_importances_
+        return feature_importance
 
     ## ploting feature importance ##
     def plotFeatureImportance(self, featureImportance, X, df):

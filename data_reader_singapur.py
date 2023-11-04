@@ -47,27 +47,33 @@ class DataReaderSingapur (DataReader):
 
    ## DATA FROM 20-03-2017 to 24-03-2017 NEEDED
    def processDataWithoutLabels(self): ## TODO LIMT SHOULD BE CHANGED HERE SO DATA IS BALANCED !!
-        self.supervised = False
-        if self.supervised == True:
-            raise ValueError("The boolean value cant be False in this situation")
-        self.createUnsupervisedFilename()
-      #   if os.path.exists(self.fileName):
-      #       return
-        self.createFile()
-        if self.checkIfFileExist():
-            return
-            
-        dirs = os.listdir(self.path[0])
-        for user in dirs:
-            if int(user) not in self.users:
-                continue # TODO
-            sessions = os.listdir(self.path[0] + '\\' + user)
-            limit = int(self.limit/len(sessions)) ## TODO THINK ABOUT THAT  
-            for session in sessions:
-                path = os.path.join(self.path[0], user, session)
-                self.processor.createProcessedCSV(path, user, self.fileName, limit, self.stolenSessions) ### Tworzenie CSVileName, limit, self.supervised, legality = 1) ### Tworzenie CSV
-        
-   
+      self.supervised = False
+      if self.supervised == True:
+         raise ValueError("The boolean value cant be False in this situation")
+      self.createUnsupervisedFilename()
+      if self.checkIfFileExist():
+         print("File already exist")
+         return
+      
+      self.createFile()
+      
+      dirs = os.listdir(self.path[0])
+      for user in dirs:
+         if int(user) not in self.users:
+            continue # TODO
+
+         sessions = os.listdir(self.path[0] + '\\' + user)
+         limit = int(self.limit/len(sessions)) ## TODO THINK ABOUT THAT  
+
+         for session in sessions:
+            path = os.path.join(self.path[0], user, session)
+            self.processor.createProcessedCSV(path, user, self.file, limit, self.stolenSessions) ### Tworzenie CSVileName, limit, self.supervised, legality = 1) ### Tworzenie CSV
+
+      self.closeFile()
+      
+  
+
+
    def processTestData(self):
       self.supervised = False
       if self.supervised == True:

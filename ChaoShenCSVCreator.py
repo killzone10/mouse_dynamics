@@ -23,6 +23,8 @@ event_mapping = {
 base_path = 'shen-continuous\\data'
 data_folder = os.listdir(base_path)   # Replace with the correct path to your folders
 basic_save_path = "ChaoShenCSV\\"
+if not os.path.exists(basic_save_path):
+    os.makedirs(basic_save_path)
 # Initialize a dictionary to store data for each prefix
 data_dict = {}
 
@@ -37,7 +39,6 @@ for dir in data_folder:
     for ef_file in os.listdir(combined_path):
         if ef_file.endswith('.ef'):
             ef_file_path = os.path.join(combined_path, ef_file)
-            print(ef_file)
             with open(ef_file_path, "rb") as file:
                 data_list = []
                 while True:

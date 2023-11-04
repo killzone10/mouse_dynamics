@@ -14,11 +14,12 @@ class DataReaderDfl (DataReader):
         if self.supervised == True:
             raise ValueError("The boolean value cant be False in this situation")
         self.createUnsupervisedFilename()
-
-        self.createFile()
         if self.checkIfFileExist():
+            print("File already exist")
             return
-            
+        self.createFile()
+       
+
         dirs = os.listdir(self.path[0])
         for dir in dirs:
             user = dir.split('User')
@@ -29,6 +30,7 @@ class DataReaderDfl (DataReader):
             limit = int(self.limit/len(sessions)) ## TODO THINK ABOUT THAT  
             for session in sessions:
                 path = os.path.join(self.path[0], dir, session)
-                self.processor.createProcessedCSV(path, user, self.fileName, limit, self.supervised, legality = 1) ### Tworzenie CSV
+                self.processor.createProcessedCSV(path, user, self.file, limit, self.supervised, legality = 1) ### Tworzenie CSV
         
-   
+
+        self.closeFile()

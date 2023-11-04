@@ -3,10 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 
+## Margit Antal1 Elod Egyed-Zsigmond Intrusion Detection Using Mouse Dynamics ˝
 
 # HELPER FUNCTIONS ## 
-
-
 def mean(array, start, stop):
     avg = 0
     amount = 0

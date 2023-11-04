@@ -8,7 +8,8 @@ class DataProcesserBalabit(DataProcesser):
     def __init__(self, user, limit):
         super().__init__(user, limit)
     
-    
+    ## Margit Antal1 Elod Egyed-Zsigmond Intrusion Detection Using Mouse Dynamics ˝
+
     def __computeFeatures(self, x, y, t, action, file, start, stop, user, supervised, legality):
         lenght = len(x)
         if lenght < GLOBAL_MIN_ACTION_LENGTH:             ## SHOULDNT EVER HAPPEN !!

@@ -25,6 +25,7 @@ class DataReader:
 
         self.supervised = supervised
         self.resetFileName()
+
         if not os.path.exists(OUTPUT_FILE):
             os.makedirs(OUTPUT_FILE)
         ## if supervised add the path of test files in balabit ##
@@ -49,17 +50,17 @@ class DataReader:
     ## CREATE FILE (its important) ##
     def createFile(self):
         try:
-            self.fileName = open(self.fileName, "w")
+            self.file = open(self.fileName, "w")
             if not self.supervised:
-                self.fileName.write(ACTION_CSV_HEADER[self.dataset])
+                self.file.write(ACTION_CSV_HEADER[self.dataset])
             else:
-                self.fileName.write(ACTION_CSV_HEADER_LEGALITY[self.dataset])
+                self.file.write(ACTION_CSV_HEADER_LEGALITY[self.dataset])
         except Exception as e:
             raise Exception(f"An error occurred while processing the opening the  file: {str(e)}")
         
     ## get file ##
-    def getFile(self):
-        return self.fileName.name
+    def getFileName(self):
+        return self.fileName
     
     ## reset path ## (used when changing the function of creating the dataset)
     def resetFileName(self):
@@ -85,12 +86,9 @@ class DataReader:
         
     def checkIfFileExist(self):
         if os.path.exists(self.fileName):
-            print(self.fileName)
-            print("True")
-
             return True
         else:
-            print("False")
             return False
 
-        
+    def closeFile(self):
+        self.file.close()

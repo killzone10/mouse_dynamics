@@ -29,7 +29,6 @@ class DataReaderChaoShen (DataReader): ## TODO ADD CHECK IF USERS EXIST IN THE B
             limit = int(self.limit/len(sessions)) ## TODO THINK ABOUT THAT  
             for session in sessions:
                 path = os.path.join(self.path[0], user, session)
-                self.processor.createProcessedCSV(path, user, self.fileName, limit) ### Tworzenie CSV
-        
+                self.processor.createProcessedCSV(path, user, self.file, limit) ### Tworzenie CSV
                     
-   
+        self.closeFile()

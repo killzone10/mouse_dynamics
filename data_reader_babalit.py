@@ -47,7 +47,10 @@ class DataReaderBalabit (DataReader):
             limit = int(self.limit/len(sessions)) ## TODO THINK ABOUT THAT  
             for session in sessions:
                 path = os.path.join(self.path[0], dir, session)
-                self.processor.createProcessedCSV(path, user, self.fileName, limit, self.supervised, legality = 1) ### Tworzenie CSV
+                self.processor.createProcessedCSV(path, user, self.file, limit, self.supervised, legality = 1) ### Tworzenie CSV
+
+
+        self.closeFile()
         
     ## CREATING LABELS WITH THE LABELS AT THE END, training = analyzing t raining files, test = analysing test files ## 
     # this class reads csv document in order to check if test files are true or false ##
@@ -85,7 +88,7 @@ class DataReaderBalabit (DataReader):
                 for session in sessions:
                     path = os.path.join(self.path[0], dir, session)
                     #TODO CHECK LEGALITY HERE !
-                    self.processor.createProcessedCSV(path, user, self.fileName, limit, self.supervised, legality) ### Tworzenie CSV
+                    self.processor.createProcessedCSV(path, user, self.file, limit, self.supervised, legality) ### Tworzenie CSV
 
         if test:
             legalityList = self.check_legality()
@@ -105,9 +108,11 @@ class DataReaderBalabit (DataReader):
                         else:
                             legality = 0
                 
-                        self.processor.createProcessedCSV(path, user, self.fileName, limit, self.supervised, legality) ### Tworzenie CSV
+                        self.processor.createProcessedCSV(path, user, self.file, limit, self.supervised, legality) ### Tworzenie CSV
 
                     except IndexError as e:
                         print(f"Index error {e}")
                     except Exception as e:
                         print(f"Unexcepted error {e}")
+
+        self.closeFile()

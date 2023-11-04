@@ -1,2 +1,0 @@
-
-        checkSession(folder)

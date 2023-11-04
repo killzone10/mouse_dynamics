@@ -1,4 +1,3 @@
-*.csv
 Mouse-Dynamics-Challenge-master-2
 *.pyc
 ChaoShenCSV
@@ -8,3 +7,4 @@ shen-continuous
 TWOS-Dataset
 *.pyc
 test_files
+dfl
