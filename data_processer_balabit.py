@@ -200,6 +200,8 @@ class DataProcesserBalabit(DataProcesser):
         if result != None:
             action_file.write(result) ## dopisz do pliku
         return
+    
+    ## The funcitons below could be 1 function, but for readibility its better to do it this way # 
     #one MM action
     def __processMM(self, x, y, t, action_file, start, stop, user, supervised, legality):
         # print("MM")
@@ -223,6 +225,8 @@ class DataProcesserBalabit(DataProcesser):
         self.__queueAction(x, y, t, PC, action_file, start, stop, user, supervised, legality)
         return
    
+       ## MM + DD - before DD there can be several MM acitons # !
+
     def __processCombinedPC(self, actions, action_file, start, stop, user, supervised, legality):
         x = []
         y = []
@@ -259,7 +263,7 @@ class DataProcesserBalabit(DataProcesser):
             lastTimestamp = currentTimestamp
         return
 
-
+    ## MM + DD - before DD there can be several MM acitons # !
     def __processCombinedDD(self, actions, action_file, start, stop, user, supervised, legality):
         x = []
         y = []
@@ -345,19 +349,19 @@ class DataProcesserBalabit(DataProcesser):
                 if row['button'] == 'Scroll':
                     continue ## TO ADD LATER 
 
-
+                ## WHEN button is released start action ## 
                 if row['button'] == 'Left' and row['state'] == 'Released': ## create EVENT
                     actions.append(record)
                     if len(actions) <= GLOBAL_MIN_ACTION_LENGTH: ## Restart the data structures, because the action is too short (maybe random)
                         actions = []
                         start = counter
                         continue
-
+                    ## if there was drag combine drag #
                     if lastRow!= None and lastRow['state'] == 'Drag':
                         end = counter
                         self.__processCombinedDD(actions, fileName, start, end, user, supervised, legality)
                         amount += 1
-
+                    # if there was press combine PC ##
                     if lastRow != None and lastRow['state'] == "Pressed": ## PC or MM Action
                         end = counter
                         self.__processCombinedPC(actions, fileName, start, end, user, supervised, legality)

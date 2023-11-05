@@ -30,7 +30,7 @@ Metody tych klas mogą wyplotować nam wykresy :
 - plotActionHistograms() historgram podzielonych wydarzeń
 - plotTypeOfActions(stacked) wykres słupokowy wydarzeń
 
-Oprócz tego split danych na testowe i treningowe zachodzi tutaj.
+oraz  to tutaj zachodzi split danych na testowe i treningowe.
 
 Część trzecia to modele. Jak narazie są w nich:
 - Random Forest,
@@ -43,7 +43,7 @@ Głowna funkcja - evaluate().
 
 Jak włączyć ---> 
 1) otwórz jupyter notebooka o nazwie main.ipynb
-2) wyekstrachowane dane powinny znajdować się w pliki processed_files
+2) wyekstrachowane dane powinny znajdować się w pliki processed_files, dzięki temu zbiory danych są niepotrzebne
 3) przeklikaj cały arkusz (dane nie powinny się tworzyć)
 
 
