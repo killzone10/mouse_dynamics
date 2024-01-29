@@ -1,0 +1,33 @@
+# Ignore compiled Python files
+*.pyc
+
+# Ignore specific directories
+ChaoShenCSV/
+processed_data/
+shen-continuous/
+TWOS-Dataset/
+test_files/
+dfl/
+processed_files/
+
+# Ignore specific file types
+*.ef
+*.csv
+*.png
+*.pdf
+
+# Ignore specific files
+chao_validate.py
+
+# Ignore VSCode configuration directory
+.vscode/
+
+# Ignore virtual environment directory
+.venv/
+
+# Ignore specific directories with some uppercase/lowercase variations
+Mouse-Dynamics-Challenge-master-2/
+
+# Ignore general directories
+wykresy/
+screeny/
