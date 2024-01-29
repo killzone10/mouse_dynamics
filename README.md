@@ -61,12 +61,3 @@ utils/plotting - nieuzywane
 - Windows 10 Education N 22H2
 
 
-
-## TODO 
-
-ADD DUPLICATES WTH X Y 
-
-                    if currentTimestamp - lastTimestamp > GLOBAL_MIN_TIME_CHAOSHEN: ## TODO
-
-
-kontynuuj akcje (nie przekazuj danych jak jest duplikat x,y ! potem gorna linia zrobi reszte)

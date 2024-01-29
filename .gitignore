@@ -26,7 +26,7 @@ chao_validate.py
 .venv/
 
 # Ignore specific directories with some uppercase/lowercase variations
-Mouse-Dynamics-Challenge-master-2/
+# Mouse-Dynamics-Challenge-master-2/
 
 # Ignore general directories
 wykresy/
