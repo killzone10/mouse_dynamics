@@ -1,3 +1,4 @@
+## Nie jest to ostateczna wersja - ta pojawi się do końca maja. Można założyć, że ten kod jest roboczy. 
 Program składa się z 3 części:
 - część pierwsza służy stworzeniu pliku z cechami i zapisania ich w processed_files
 - część druga to analiza i podzielenie danych na treningowe i testowe 
@@ -37,7 +38,7 @@ Część trzecia to modele. Jak narazie są w nich:
 - SVM,
 - One class SVM,
 - Isoltion forest.
-
+- VAE
 Głowna funkcja - evaluate().
 
 
